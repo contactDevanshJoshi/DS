@@ -1,23 +1,23 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Login</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.2.0/crypto-js.min.js"></script>
 </head>
 
-<body class="bg-gradient-to-br from-blue-100 to-purple-100 h-screen flex items-center justify-center">
+<body class="bg-gradient-to-br from-blue-100 to-purple-100 min-h-screen flex items-center justify-center p-4">
 
-<div class="bg-white p-8 rounded-xl shadow w-96">
+<div class="bg-white p-6 rounded-2xl shadow w-full max-w-md">
 
-<h2 class="text-xl font-bold text-center mb-4">DS Quiz Login</h2>
+<h2 class="text-xl font-bold text-center mb-6">DS Quiz Login</h2>
 
-<form id="loginForm">
-<input id="enrollment" placeholder="Enrollment" class="w-full p-2 border rounded mb-3">
-<input id="password" type="password" placeholder="Password" class="w-full p-2 border rounded mb-3">
-<p id="errorMessage" class="text-red-500 text-sm mb-2"></p>
-<button class="w-full bg-blue-500 text-white p-2 rounded">Login</button>
+<form id="loginForm" class="space-y-4">
+<input id="enrollment" placeholder="Enrollment" class="w-full p-3 border rounded-lg">
+<input id="password" type="password" placeholder="Password" class="w-full p-3 border rounded-lg">
+<p id="errorMessage" class="text-red-500 text-sm"></p>
+<button class="w-full bg-blue-500 text-white p-3 rounded-lg">Login</button>
 </form>
 
 </div>
