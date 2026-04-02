@@ -14,7 +14,7 @@
 
 <h2 class="text-xl font-bold text-center">Admin Panel</h2>
 
-<!-- UNIT + DIFFICULTY -->
+<!-- UNIT & DIFFICULTY -->
 <select id="unit" class="w-full p-2 border rounded">
 <option>unit1</option>
 <option>unit2</option>
@@ -69,26 +69,33 @@ Import Users CSV
 
 <script type="module">
 import { db } from "./firebase.js";
-import { collection, addDoc, getDocs, deleteDoc, doc, updateDoc } 
-from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+import { 
+  collection, addDoc, getDocs, deleteDoc, doc, updateDoc, setDoc, getDoc 
+} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
 // ================= ADD QUESTION =================
 addBtn.onclick = async ()=>{
 
  let data = {
-   unit: unit.value,
-   difficulty: difficulty.value,
-   q: q.value,
-   o: [o1.value,o2.value,o3.value,o4.value],
+   unit: unit.value.trim(),
+   difficulty: difficulty.value.trim(),
+   q: q.value.trim(),
+   o: [o1.value.trim(),o2.value.trim(),o3.value.trim(),o4.value.trim()],
    a: Number(ans.value)
  };
 
+ if(!data.q || data.o.includes("")){
+   alert("Fill all fields");
+   return;
+ }
+
  await addDoc(collection(db,"questions"), data);
- alert("Added");
+
+ alert("Question Added");
  load();
 };
 
-// ================= LOAD =================
+// ================= LOAD QUESTIONS =================
 async function load(){
 
  list.innerHTML="Loading...";
@@ -107,7 +114,7 @@ async function load(){
   div.innerHTML = `
     <b>${data.q}</b><br>
     ${data.o.join(" | ")}<br>
-    Ans: ${data.a}
+    <span class="text-sm">Ans: ${data.a} | ${data.unit} | ${data.difficulty}</span>
     <div class="flex gap-2 mt-2">
       <button onclick="edit('${d.id}')" class="bg-yellow-400 px-2 rounded">Edit</button>
       <button onclick="del('${d.id}')" class="bg-red-500 text-white px-2 rounded">Delete</button>
@@ -133,7 +140,7 @@ window.edit = async(id)=>{
  let newQ = prompt("New Question:");
  if(!newQ) return;
 
- await updateDoc(doc(db,"questions",id),{ q:newQ });
+ await updateDoc(doc(db,"questions",id),{ q:newQ.trim() });
  load();
 };
 
@@ -141,26 +148,29 @@ window.edit = async(id)=>{
 uploadQ.onclick = ()=>{
 
  let file = csvQ.files[0];
+ if(!file) return alert("Select file");
+
  let reader = new FileReader();
 
  reader.onload = async e=>{
   let lines = e.target.result.split("\n");
 
   for(let line of lines){
+
     let [q,o1,o2,o3,o4,a,unit,diff] = line.split(",");
 
     if(!q) continue;
 
     await addDoc(collection(db,"questions"),{
-      q,
-      o:[o1,o2,o3,o4],
+      q: q.trim(),
+      o:[o1,o2,o3,o4].map(x=>x.trim()),
       a:Number(a),
-      unit,
-      difficulty:diff
+      unit: unit.trim(),
+      difficulty: diff.trim()
     });
   }
 
-  alert("Questions uploaded");
+  alert("Questions Uploaded");
   load();
  };
 
@@ -171,6 +181,7 @@ uploadQ.onclick = ()=>{
 exportQ.onclick = async ()=>{
 
  let snap = await getDocs(collection(db,"questions"));
+
  let csv = "q,o1,o2,o3,o4,a,unit,difficulty\n";
 
  snap.forEach(d=>{
@@ -185,13 +196,17 @@ exportQ.onclick = async ()=>{
  a.click();
 };
 
-// ================= USERS CSV =================
+// ================= USERS CSV (FIXED) =================
 uploadUsers.onclick = ()=>{
 
  let file = csvUsers.files[0];
+ if(!file) return alert("Select file");
+
  let reader = new FileReader();
 
  reader.onload = async e=>{
+
+  uploadUsers.innerText="Uploading...";
 
   let lines = e.target.result.split("\n");
 
@@ -201,16 +216,29 @@ uploadUsers.onclick = ()=>{
 
     if(!enroll) continue;
 
+    enroll = enroll.trim();
+    password = password.trim();
+
+    let userRef = doc(db,"users",enroll);
+
+    // 🔥 prevent duplicate
+    let snap = await getDoc(userRef);
+    if(snap.exists()){
+      console.log("User exists:", enroll);
+      continue;
+    }
+
     let hash = CryptoJS.SHA256(password).toString();
 
-    await addDoc(collection(db,"users"),{
+    await setDoc(userRef,{
       enrollment: enroll,
       passwordHash: hash,
-      role: role || "student"
+      role: role?.trim() || "student"
     });
   }
 
-  alert("Users Imported");
+  uploadUsers.innerText="Import Users CSV";
+  alert("Users Imported Successfully");
  };
 
  reader.readAsText(file);
