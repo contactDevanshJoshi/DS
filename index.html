@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center h-screen">
+
+<div class="bg-white p-8 rounded-2xl shadow-lg w-80 text-center">
+  <h1 class="text-2xl font-bold mb-4 text-blue-600">DS Quiz App</h1>
+
+  <input id="enroll" type="text" placeholder="Enrollment No"
+    class="w-full p-2 border rounded mb-3">
+
+  <input id="pass" type="password" placeholder="Password"
+    class="w-full p-2 border rounded mb-4">
+
+  <button onclick="login()" class="w-full bg-blue-500 text-white p-2 rounded">
+    Login
+  </button>
+</div>
+
+<script>
+function login(){
+  let e = enroll.value;
+  let p = pass.value;
+
+  if(e && p){
+    localStorage.setItem("user", e);
+    window.location.href = "dashboard.html";
+  } else alert("Enter details");
+}
+</script>
+
+</body>
+</html>
