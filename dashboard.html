@@ -1,41 +1,690 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Dashboard</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
+<!-- Dashboard -->
 
-<body class="bg-gradient-to-br from-blue-100 to-purple-100 p-6">
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DS Quiz Dashboard</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+    
+    * {
+      font-family: 'Poppins', sans-serif;
+      box-sizing: border-box;
+    }
 
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: linear-gradient(135deg, #e0f2fe 0%, #f0e7ff 100%);
+      overflow-y: auto;
+    }
+
+    .dashboard-wrapper {
+      height: 100%;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      padding: 2rem 1rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2.5rem;
+      animation: slideDown 0.6s ease-out;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .header h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #3b82f6, #a855f7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 0;
+    }
+
+    .profile-icon {
+      width: 50px;
+      height: 50px;
+      background: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      color: #3b82f6;
+    }
+
+    .profile-icon:hover {
+      transform: scale(1.05);
+      box-shadow: 0 8px 20px rgba(59, 130, 246, 0.2);
+    }
+
+    .units-section {
+      margin-bottom: 2.5rem;
+    }
+
+    .section-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #1e293b;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .units-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .unit-card {
+      background: white;
+      border-radius: 1.5rem;
+      padding: 2rem;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      animation: fadeIn 0.5s ease-out forwards;
+      opacity: 0;
+    }
+
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+      }
+    }
+
+    .unit-card:nth-child(1) { animation-delay: 0.1s; }
+    .unit-card:nth-child(2) { animation-delay: 0.2s; }
+    .unit-card:nth-child(3) { animation-delay: 0.3s; }
+    .unit-card:nth-child(4) { animation-delay: 0.4s; }
+
+    .unit-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+    }
+
+    .unit-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
+      font-size: 1.75rem;
+    }
+
+    .unit-icon.arrays {
+      background: rgba(59, 130, 246, 0.1);
+      color: #3b82f6;
+    }
+
+    .unit-icon.stack {
+      background: rgba(168, 85, 247, 0.1);
+      color: #a855f7;
+    }
+
+    .unit-icon.expressions {
+      background: rgba(34, 197, 94, 0.1);
+      color: #22c55e;
+    }
+
+    .unit-icon.queue {
+      background: rgba(244, 63, 94, 0.1);
+      color: #f43f5e;
+    }
+
+    .unit-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #1e293b;
+      margin-bottom: 0.5rem;
+    }
+
+    .unit-meta {
+      font-size: 0.85rem;
+      color: #64748b;
+      margin-top: 0.75rem;
+    }
+
+    .bottom-section {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .info-card {
+      background: white;
+      border-radius: 1.5rem;
+      padding: 2rem;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+      animation: fadeIn 0.5s ease-out 0.5s forwards;
+      opacity: 0;
+    }
+
+    .info-card-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #1e293b;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 0;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .stat-row:last-child {
+      border-bottom: none;
+    }
+
+    .stat-label {
+      color: #64748b;
+      font-size: 0.95rem;
+    }
+
+    .stat-value {
+      color: #1e293b;
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+
+    .profile-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem 0;
+      margin-bottom: 1rem;
+    }
+
+    .profile-avatar {
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, #3b82f6, #a855f7);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 600;
+      font-size: 1.25rem;
+    }
+
+    .profile-details h3 {
+      margin: 0;
+      color: #1e293b;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .profile-details p {
+      margin: 0.25rem 0 0 0;
+      color: #64748b;
+      font-size: 0.85rem;
+    }
+
+    @media (max-width: 768px) {
+      .dashboard-wrapper {
+        padding: 1.5rem 1rem;
+      }
+
+      .header h1 {
+        font-size: 1.75rem;
+      }
+
+      .units-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .bottom-section {
+        grid-template-columns: 1fr;
+      }
+
+      .unit-card {
+        padding: 1.5rem;
+      }
+
+      .info-card {
+        padding: 1.5rem;
+      }
+    }
+  </style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  <style>body { box-sizing: border-box; }</style>
+ </head>
+ <body>
+  <div class="dashboard-wrapper"><!-- Header -->
+   <div class="header">
+    <h1 id="headerTitle">DS Quiz Dashboard</h1>
+    <div class="profile-icon"><i data-lucide="user" style="width: 24px; height: 24px;"></i>
+    </div>
+   </div><!-- Units Section -->
+   <div class="units-section">
+    <div class="section-title"><i data-lucide="layers" style="width: 20px; height: 20px; color: #3b82f6;"></i> Learning Units
+    </div>
+    <div class="units-grid"><!-- Unit 1 -->
+     <div class="unit-card">
+      <div class="unit-icon arrays"><i data-lucide="grid-3x3" style="width: 32px; height: 32px;"></i>
+      </div>
+      <div class="unit-title" id="unit1Title">
+       Arrays
+      </div>
+      <div class="unit-meta">
+       5 Questions • Medium
+      </div>
+     </div><!-- Unit 2 -->
+     <div class="unit-card">
+      <div class="unit-icon stack"><i data-lucide="layers" style="width: 32px; height: 32px;"></i>
+      </div>
+      <div class="unit-title" id="unit2Title">
+       Stack
+      </div>
+      <div class="unit-meta">
+       6 Questions • Hard
+      </div>
+     </div><!-- Unit 3 -->
+     <div class="unit-card">
+      <div class="unit-icon expressions"><i data-lucide="code" style="width: 32px; height: 32px;"></i>
+      </div>
+      <div class="unit-title" id="unit3Title">
+       Expressions
+      </div>
+      <div class="unit-meta">
+       4 Questions • Easy
+      </div>
+     </div><!-- Unit 4 -->
+     <div class="unit-card">
+      <div class="unit-icon queue"><i data-lucide="arrow-right" style="width: 32px; height: 32px;"></i>
+      </div>
+      <div class="unit-title" id="unit4Title">
+       Queue
+      </div>
+      <div class="unit-meta">
+       7 Questions • Medium
+      </div>
+     </div>
+    </div>
+   </div><!-- Bottom Section: Results & Profile -->
+   <div class="bottom-section"><!-- Result Analysis -->
+    <div class="info-card">
+     <div class="info-card-title"><i data-lucide="bar-chart-2" style="width: 20px; height: 20px; color: #3b82f6;"></i> <span id="resultsTitle">Result Analysis</span>
+     </div>
+     <div class="stat-row"><span class="stat-label">Total Quizzes Attempted</span> <span class="stat-value">12</span>
+     </div>
+     <div class="stat-row"><span class="stat-label">Overall Accuracy</span> <span class="stat-value">78%</span>
+     </div>
+     <div class="stat-row"><span class="stat-label">Best Score</span> <span class="stat-value">95%</span>
+     </div>
+     <div class="stat-row"><span class="stat-label">Average Score</span> <span class="stat-value">82%</span>
+     </div>
+    </div><!-- Profile Card -->
+    <div class="info-card">
+     <div class="info-card-title"><i data-lucide="user-check" style="width: 20px; height: 20px; color: #a855f7;"></i> <span id="profileTitle">Your Profile</span>
+     </div>
+     <div class="profile-info">
+      <div class="profile-avatar">
+       A
+      </div>
+      <div class="profile-details">
+       <h3>Arjun Kumar</h3>
+       <p>Enrollment: CS2024089</p>
+      </div>
+     </div>
+     <div class="stat-row"><span class="stat-label">Streak</span> <span class="stat-value">7 days</span>
+     </div>
+     <div class="stat-row"><span class="stat-label">Topics Mastered</span> <span class="stat-value">3/4</span>
+     </div>
+     <div class="stat-row"><span class="stat-label">Rank</span> <span class="stat-value">#8 in class</span>
+     </div>
+    </div>
+   </div>
+  </div>
+  <script>
+    let config = {
+      header_title: 'DS Quiz Dashboard',
+      unit1_title: 'Arrays',
+      unit2_title: 'Stack',
+      unit3_title: 'Expressions',
+      unit4_title: 'Queue',
+      results_title: 'Result Analysis',
+      profile_title: 'Your Profile'
+    };
+
+    const defaultConfig = {
+      header_title: 'DS Quiz Dashboard',
+      unit1_title: 'Arrays',
+      unit2_title: 'Stack',
+      unit3_title: 'Expressions',
+      unit4_title: 'Queue',
+      results_title: 'Result Analysis',
+      profile_title: 'Your Profile'
+    };
+
+    async function initializeSDK() {
+      await window.elementSdk.init({
+        defaultConfig,
+        onConfigChange: async (updatedConfig) => {
+          config = updatedConfig;
+          document.getElementById('headerTitle').textContent = config.header_title || defaultConfig.header_title;
+          document.getElementById('unit1Title').textContent = config.unit1_title || defaultConfig.unit1_title;
+          document.getElementById('unit2Title').textContent = config.unit2_title || defaultConfig.unit2_title;
+          document.getElementById('unit3Title').textContent = config.unit3_title || defaultConfig.unit3_title;
+          document.getElementById('unit4Title').textContent = config.unit4_title || defaultConfig.unit4_title;
+          document.getElementById('resultsTitle').textContent = config.results_title || defaultConfig.results_title;
+          document.getElementById('profileTitle').textContent = config.profile_title || defaultConfig.profile_title;
+        },
+        mapToCapabilities: () => ({
+          recolorables: [],
+          borderables: [],
+          fontEditable: undefined,
+          fontSizeable: undefined
+        }),
+        mapToEditPanelValues: () => new Map([
+          ['header_title', config.header_title || defaultConfig.header_title],
+          ['unit1_title', config.unit1_title || defaultConfig.unit1_title],
+          ['unit2_title', config.unit2_title || defaultConfig.unit2_title],
+          ['unit3_title', config.unit3_title || defaultConfig.unit3_title],
+          ['unit4_title', config.unit4_title || defaultConfig.unit4_title],
+          ['results_title', config.results_title || defaultConfig.results_title],
+          ['profile_title', config.profile_title || defaultConfig.profile_title]
+        ])
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.elementSdk) {
+        initializeSDK();
+      }
+
+      // Add click handlers to unit cards
+      const unitCards = document.querySelectorAll('.unit-card');
+      unitCards.forEach(card => {
+        card.addEventListener('click', () => {
+          const title = card.querySelector('.unit-title').textContent;
+          console.log(`Starting ${title} quiz`);
+        });
+      });
+
+      // Add click handler to profile icon
+      const profileIcon = document.querySelector('.profile-icon');
+      profileIcon.addEventListener('click', () => {
+        console.log('Profile clicked');
+      });
+    });
+
+    lucide.createIcons();
+  </script>
+ <script>
+ (function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9e5c890536e93fc7',t:'MTc3NTA5ODMyMy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();
+ </script>
+ 
 <script>
-if(!localStorage.getItem("user")) location.href="index.html";
+
+// ================= GLOBAL AUTH =================
+const page = location.pathname.split("/").pop();
+
+if(page !== "index.html" && !localStorage.getItem("user")){
+  location.href = "index.html";
+}
+
+// ================= LOGIN =================
+const form = document.getElementById("loginForm");
+
+if(form){
+  form.onsubmit = (e)=>{
+    e.preventDefault();
+
+    let enroll = document.getElementById("enrollment").value.trim();
+
+    if(!enroll){
+      document.getElementById("errorMessage").style.display="block";
+      return;
+    }
+
+    localStorage.setItem("user", enroll);
+    location.href="dashboard.html";
+  };
+}
+
+// ================= DASHBOARD =================
+const unitCards = document.querySelectorAll(".unit-card");
+
+if(unitCards.length){
+  unitCards.forEach(card=>{
+    card.onclick=()=>{
+      let unit = card.querySelector(".unit-title").innerText;
+      localStorage.setItem("unit", unit);
+      location.href="difficulty.html";
+    };
+  });
+}
+
+// ================= PROFILE ICON =================
+const profileIcon = document.querySelector(".profile-icon");
+if(profileIcon){
+  profileIcon.onclick=()=>location.href="profile.html";
+}
+
+// ================= DIFFICULTY =================
+const diffCards = document.querySelectorAll(".difficulty-card");
+
+if(diffCards.length){
+
+  diffCards.forEach(card=>{
+    card.onclick=()=>{
+      let d = card.getAttribute("data-difficulty");
+      localStorage.setItem("difficulty", d);
+      setTimeout(()=>location.href="quiz.html",400);
+    };
+  });
+
+}
+
+// ================= QUIZ =================
+const questionText = document.getElementById("questionText");
+
+if(questionText){
+
+let questions = [
+ {q:"What is Array?",o:["DS","Loop","Func","Var"],a:0},
+ {q:"Stack follows?",o:["FIFO","LIFO","None","Both"],a:1},
+ {q:"Queue follows?",o:["FIFO","LIFO","None","Both"],a:0},
+ {q:"Which DS is linear?",o:["Array","Tree","Graph","Heap"],a:0}
+];
+
+questions = questions.sort(()=>Math.random()-0.5);
+
+let index=0, score=0;
+
+const opts = document.querySelectorAll(".option-button");
+const next = document.getElementById("nextButton");
+
+function load(){
+ let q=questions[index];
+
+ document.getElementById("questionText").innerText=q.q;
+
+ document.getElementById("option0").innerText=q.o[0];
+ document.getElementById("option1").innerText=q.o[1];
+ document.getElementById("option2").innerText=q.o[2];
+ document.getElementById("option3").innerText=q.o[3];
+
+ document.getElementById("currentQuestion").innerText=index+1;
+ document.getElementById("questionNumber").innerText=index+1;
+ document.getElementById("totalQuestions").innerText=questions.length;
+ document.getElementById("questionTotal").innerText=questions.length;
+
+ document.getElementById("progressBar").style.width =
+  ((index)/questions.length)*100+"%";
+}
+
+opts.forEach((b,i)=>{
+ b.onclick=()=>{
+   opts.forEach(x=>x.classList.remove("selected"));
+   b.classList.add("selected");
+
+   if(i===questions[index].a) score++;
+
+   next.disabled=false;
+ };
+});
+
+next.onclick=()=>{
+ index++;
+
+ if(index<questions.length){
+   load();
+ }else{
+   localStorage.setItem("score",score);
+   localStorage.setItem("total",questions.length);
+
+   let results = JSON.parse(localStorage.getItem("results"))||{};
+   let unit = localStorage.getItem("unit");
+   results[unit]={score,total:questions.length};
+   localStorage.setItem("results",JSON.stringify(results));
+
+   location.href="result.html";
+ }
+};
+
+load();
+}
+
+// ================= RESULT =================
+if(document.getElementById("scoreNumber")){
+
+let s = Number(localStorage.getItem("score"))||0;
+let t = Number(localStorage.getItem("total"))||0;
+
+document.getElementById("scoreNumber").innerText=s;
+document.getElementById("scoreTotal").innerText=t;
+
+let p = Math.round((s/t)*100);
+document.getElementById("percentage").innerText=p+"%";
+
+document.getElementById("retryBtn").onclick=()=>{
+ location.href="difficulty.html";
+};
+
+document.getElementById("dashboardBtn").onclick=()=>{
+ location.href="dashboard.html";
+};
+
+}
+
+// ================= ANALYSIS =================
+if(document.getElementById("analysisPage")){
+
+let data = JSON.parse(localStorage.getItem("results"))||{};
+
+for(let unit in data){
+ console.log(unit, data[unit]);
+}
+
+}
+
+// ================= PROFILE =================
+if(document.getElementById("profilePage")){
+
+let user = localStorage.getItem("user");
+
+document.getElementById("studentName").innerText=user;
+document.getElementById("enrollmentValue").innerText=user;
+
+document.getElementById("logoutBtn").onclick=()=>{
+ localStorage.clear();
+ location.href="index.html";
+};
+
+}
+
 </script>
 
-<h1 class="text-2xl font-bold text-center mb-6">Dashboard</h1>
+<script type="module">
 
-<div class="grid grid-cols-2 gap-4">
-  <button onclick="go('unit1')" class="p-6 bg-white rounded shadow">Unit 1</button>
-  <button onclick="go('unit2')" class="p-6 bg-white rounded shadow">Unit 2</button>
-  <button onclick="go('unit3')" class="p-6 bg-white rounded shadow">Unit 3</button>
-  <button onclick="go('unit4')" class="p-6 bg-white rounded shadow">Unit 4</button>
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+import { 
+  getFirestore, collection, getDocs, doc, setDoc, getDoc 
+} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
-  <button onclick="location.href='analysis.html'" class="p-6 bg-white rounded shadow">Analysis</button>
-  <button onclick="location.href='profile.html'" class="p-6 bg-white rounded shadow">Profile</button>
-</div>
+const firebaseConfig = {
+  apiKey: "AIzaSyCDx6abGpJdQltTmfzllb9DRQBHvMphFR0",
+  authDomain: "ds-sem2.firebaseapp.com",
+  projectId: "ds-sem2"
+};
 
-<button onclick="logout()" class="mt-6 bg-red-400 text-white px-4 py-2 rounded">Logout</button>
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-<script>
-function go(u){
-  localStorage.setItem("unit", u);
-  localStorage.removeItem("difficulty");
-  location.href="difficulty.html";
-}
+window.db = db;
 
-function logout(){
-  localStorage.clear();
-  location.href="index.html";
-}
+</script>
+
+<script type="module">
+
+import { collection, getDocs } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+const cards = document.querySelectorAll(".unit-card");
+
+cards.forEach(async card => {
+
+  let unit = card.querySelector(".unit-title").innerText.toLowerCase();
+
+  let total = 0;
+
+  for(let diff of ["easy","medium","hard"]){
+
+    const snap = await getDocs(collection(db,"questions",unit,diff));
+    total += snap.size;
+  }
+
+  // show count in UI (adjust selector if needed)
+  let el = card.querySelector(".question-count");
+  if(el) el.innerText = total + " Questions";
+
+});
+
 </script>
 
 </body>

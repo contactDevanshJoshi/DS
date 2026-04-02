@@ -1,0 +1,765 @@
+<!-- Quiz -->
+
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz - DS Quiz App</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+    
+    * {
+      font-family: 'Poppins', sans-serif;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0e7ff 100%);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .quiz-container {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      padding: 1.5rem;
+      max-width: 1000px;
+      margin: 0 auto;
+      overflow-y: auto;
+    }
+
+    .quiz-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      animation: slideDown 0.5s ease-out;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .quiz-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #3b82f6;
+      margin: 0;
+    }
+
+    .quiz-progress {
+      font-size: 0.95rem;
+      color: #64748b;
+      font-weight: 600;
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      height: 6px;
+      background: #e2e8f0;
+      border-radius: 10px;
+      margin-bottom: 2rem;
+      overflow: hidden;
+      animation: slideDown 0.6s ease-out;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #3b82f6, #2563eb);
+      width: 30%;
+      transition: width 0.3s ease;
+      border-radius: 10px;
+    }
+
+    .quiz-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      animation: fadeIn 0.5s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    .question-card {
+      background: white;
+      border-radius: 1.5rem;
+      padding: 2.5rem;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+      max-width: 700px;
+      width: 100%;
+      margin-bottom: 2rem;
+      animation: cardSlide 0.5s ease-out;
+    }
+
+    @keyframes cardSlide {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .question-text {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #1e293b;
+      margin: 0;
+      line-height: 1.6;
+      margin-bottom: 0.5rem;
+    }
+
+    .question-meta {
+      font-size: 0.85rem;
+      color: #94a3b8;
+      margin-bottom: 2rem;
+    }
+
+    .options-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      max-width: 700px;
+      width: 100%;
+    }
+
+    .option-button {
+      background: white;
+      border: 2px solid #e2e8f0;
+      border-radius: 1rem;
+      padding: 1.25rem 1.75rem;
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #1e293b;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      animation: optionFade 0.5s ease-out backwards;
+    }
+
+    @keyframes optionFade {
+      from {
+        opacity: 0;
+        transform: translateX(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    .option-button:nth-child(1) { animation-delay: 0.1s; }
+    .option-button:nth-child(2) { animation-delay: 0.15s; }
+    .option-button:nth-child(3) { animation-delay: 0.2s; }
+    .option-button:nth-child(4) { animation-delay: 0.25s; }
+
+    .option-button:hover:not(.disabled) {
+      border-color: #3b82f6;
+      box-shadow: 0 6px 20px rgba(59, 130, 246, 0.15);
+      transform: translateX(4px);
+    }
+
+    .option-button.selected {
+      border-color: #3b82f6;
+      background: #eff6ff;
+    }
+
+    .option-button.correct {
+      border-color: #22c55e;
+      background: #f0fdf4;
+      color: #16a34a;
+    }
+
+    .option-button.incorrect {
+      border-color: #ef4444;
+      background: #fef2f2;
+      color: #dc2626;
+    }
+
+    .option-button.disabled {
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+
+    .option-letter {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      background: #f0f4f8;
+      border-radius: 50%;
+      font-weight: 700;
+      margin-right: 1rem;
+      color: #3b82f6;
+      flex-shrink: 0;
+    }
+
+    .option-button.selected .option-letter,
+    .option-button.correct .option-letter,
+    .option-button.incorrect .option-letter {
+      background: currentColor;
+      color: white;
+    }
+
+    .feedback-message {
+      display: none;
+      align-items: center;
+      gap: 0.75rem;
+      margin-top: 1rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      animation: slideDown 0.3s ease-out;
+    }
+
+    .feedback-message.show {
+      display: flex;
+    }
+
+    .feedback-message.correct {
+      color: #22c55e;
+    }
+
+    .feedback-message.incorrect {
+      color: #ef4444;
+    }
+
+    .quiz-actions {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      max-width: 700px;
+      width: 100%;
+      animation: slideUp 0.5s ease-out 0.3s backwards;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .next-button {
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: white;
+      border: none;
+      border-radius: 1rem;
+      padding: 1rem 2rem;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      flex: 1;
+      max-width: 200px;
+    }
+
+    .next-button:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+    }
+
+    .next-button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    @media (max-width: 768px) {
+      .quiz-container {
+        padding: 1rem;
+      }
+
+      .question-card {
+        padding: 1.5rem;
+      }
+
+      .question-text {
+        font-size: 1.25rem;
+      }
+
+      .option-button {
+        padding: 1rem 1.25rem;
+        font-size: 0.95rem;
+      }
+
+      .option-letter {
+        width: 28px;
+        height: 28px;
+        font-size: 0.85rem;
+        margin-right: 0.75rem;
+      }
+
+      .quiz-header {
+        flex-direction: column;
+        gap: 0.5rem;
+        text-align: center;
+      }
+
+      .quiz-actions {
+        flex-direction: column;
+      }
+
+      .next-button {
+        max-width: 100%;
+      }
+    }
+  </style>
+  <style>body { box-sizing: border-box; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ </head>
+ <body>
+  <div class="quiz-container">
+   <div class="quiz-header">
+    <h1 class="quiz-title" id="quizTitle">Data Structures Quiz</h1>
+    <div class="quiz-progress">
+     <span id="currentQuestion">3</span>/<span id="totalQuestions">10</span>
+    </div>
+   </div>
+   <div class="progress-bar-container">
+    <div class="progress-bar" id="progressBar"></div>
+   </div>
+   <div class="quiz-content">
+    <div class="question-card">
+     <div class="question-meta">
+      Question <span id="questionNumber">3</span> of <span id="questionTotal">10</span>
+     </div>
+     <h2 class="question-text" id="questionText">What is an array?</h2>
+    </div>
+    <div class="options-container" id="optionsContainer"><button class="option-button" data-option="0"> <span class="option-letter">A</span> <span class="option-content" id="option0">A collection of elements</span> </button> <button class="option-button" data-option="1"> <span class="option-letter">B</span> <span class="option-content" id="option1">A data structure</span> </button> <button class="option-button" data-option="2"> <span class="option-letter">C</span> <span class="option-content" id="option2">A variable</span> </button> <button class="option-button" data-option="3"> <span class="option-letter">D</span> <span class="option-content" id="option3">A function</span> </button>
+    </div>
+    <div class="feedback-message" id="feedbackMessage"><i data-lucide="check-circle" style="width: 20px; height: 20px;"></i> <span id="feedbackText">Correct! Well done.</span>
+    </div>
+   </div>
+   <div class="quiz-actions"><button class="next-button" id="nextButton" disabled>Next Question</button>
+   </div>
+  </div>
+  <script>
+    let config = {
+      quiz_title: 'Data Structures Quiz',
+      question_text: 'What is an array?',
+      option_a: 'A collection of elements',
+      option_b: 'A data structure',
+      option_c: 'A variable',
+      option_d: 'A function',
+      next_button: 'Next Question'
+    };
+
+    const defaultConfig = {
+      quiz_title: 'Data Structures Quiz',
+      question_text: 'What is an array?',
+      option_a: 'A collection of elements',
+      option_b: 'A data structure',
+      option_c: 'A variable',
+      option_d: 'A function',
+      next_button: 'Next Question'
+    };
+
+    let selectedOption = null;
+    let answered = false;
+    const correctAnswer = 0;
+
+    async function initializeSDK() {
+      await window.elementSdk.init({
+        defaultConfig,
+        onConfigChange: async (updatedConfig) => {
+          config = updatedConfig;
+          document.getElementById('quizTitle').textContent = config.quiz_title || defaultConfig.quiz_title;
+          document.getElementById('questionText').textContent = config.question_text || defaultConfig.question_text;
+          document.getElementById('option0').textContent = config.option_a || defaultConfig.option_a;
+          document.getElementById('option1').textContent = config.option_b || defaultConfig.option_b;
+          document.getElementById('option2').textContent = config.option_c || defaultConfig.option_c;
+          document.getElementById('option3').textContent = config.option_d || defaultConfig.option_d;
+          document.getElementById('nextButton').textContent = config.next_button || defaultConfig.next_button;
+        },
+        mapToCapabilities: () => ({
+          recolorables: [],
+          borderables: [],
+          fontEditable: undefined,
+          fontSizeable: undefined
+        }),
+        mapToEditPanelValues: () => new Map([
+          ['quiz_title', config.quiz_title || defaultConfig.quiz_title],
+          ['question_text', config.question_text || defaultConfig.question_text],
+          ['option_a', config.option_a || defaultConfig.option_a],
+          ['option_b', config.option_b || defaultConfig.option_b],
+          ['option_c', config.option_c || defaultConfig.option_c],
+          ['option_d', config.option_d || defaultConfig.option_d],
+          ['next_button', config.next_button || defaultConfig.next_button]
+        ])
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.elementSdk) {
+        initializeSDK();
+      }
+
+      const optionButtons = document.querySelectorAll('.option-button');
+      const nextButton = document.getElementById('nextButton');
+      const feedbackMessage = document.getElementById('feedbackMessage');
+      const feedbackText = document.getElementById('feedbackText');
+
+      optionButtons.forEach((button, index) => {
+        button.addEventListener('click', () => {
+          if (answered) return;
+
+          // Clear previous selection
+          optionButtons.forEach(btn => btn.classList.remove('selected'));
+
+          // Mark selected option
+          selectedOption = index;
+          button.classList.add('selected');
+
+          // Show answer feedback after a short delay
+          setTimeout(() => {
+            answered = true;
+            optionButtons.forEach((btn, i) => {
+              btn.classList.add('disabled');
+              if (i === correctAnswer) {
+                btn.classList.add('correct');
+              } else if (i === selectedOption && selectedOption !== correctAnswer) {
+                btn.classList.add('incorrect');
+              }
+            });
+
+            // Show feedback message
+            const isCorrect = selectedOption === correctAnswer;
+            feedbackMessage.classList.add('show');
+            feedbackMessage.classList.add(isCorrect ? 'correct' : 'incorrect');
+            feedbackText.textContent = isCorrect ? '✓ Correct! Well done.' : '✗ Incorrect. Try the next one!';
+
+            // Enable next button
+            nextButton.disabled = false;
+          }, 300);
+        });
+      });
+
+      nextButton.addEventListener('click', () => {
+        // Reset for next question
+        selectedOption = null;
+        answered = false;
+        optionButtons.forEach(btn => {
+          btn.classList.remove('selected', 'correct', 'incorrect', 'disabled');
+        });
+        feedbackMessage.classList.remove('show', 'correct', 'incorrect');
+        nextButton.disabled = true;
+
+        // Simulate moving to next question
+        const currentQ = parseInt(document.getElementById('currentQuestion').textContent);
+        if (currentQ < 10) {
+          document.getElementById('currentQuestion').textContent = currentQ + 1;
+          document.getElementById('questionNumber').textContent = currentQ + 1;
+          const progress = ((currentQ) / 10) * 100;
+          document.getElementById('progressBar').style.width = progress + '%';
+        }
+      });
+
+      lucide.createIcons();
+    });
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9e5c92480457fcad',t:'MTc3NTA5ODcwMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
+
+<script>
+
+// ================= GLOBAL AUTH =================
+const page = location.pathname.split("/").pop();
+
+if(page !== "index.html" && !localStorage.getItem("user")){
+  location.href = "index.html";
+}
+
+// ================= LOGIN =================
+const form = document.getElementById("loginForm");
+
+if(form){
+  form.onsubmit = (e)=>{
+    e.preventDefault();
+
+    let enroll = document.getElementById("enrollment").value.trim();
+
+    if(!enroll){
+      document.getElementById("errorMessage").style.display="block";
+      return;
+    }
+
+    localStorage.setItem("user", enroll);
+    location.href="dashboard.html";
+  };
+}
+
+// ================= DASHBOARD =================
+const unitCards = document.querySelectorAll(".unit-card");
+
+if(unitCards.length){
+  unitCards.forEach(card=>{
+    card.onclick=()=>{
+      let unit = card.querySelector(".unit-title").innerText;
+      localStorage.setItem("unit", unit);
+      location.href="difficulty.html";
+    };
+  });
+}
+
+// ================= PROFILE ICON =================
+const profileIcon = document.querySelector(".profile-icon");
+if(profileIcon){
+  profileIcon.onclick=()=>location.href="profile.html";
+}
+
+// ================= DIFFICULTY =================
+const diffCards = document.querySelectorAll(".difficulty-card");
+
+if(diffCards.length){
+
+  diffCards.forEach(card=>{
+    card.onclick=()=>{
+      let d = card.getAttribute("data-difficulty");
+      localStorage.setItem("difficulty", d);
+      setTimeout(()=>location.href="quiz.html",400);
+    };
+  });
+
+}
+
+// ================= QUIZ =================
+const questionText = document.getElementById("questionText");
+
+if(questionText){
+
+let questions = [
+ {q:"What is Array?",o:["DS","Loop","Func","Var"],a:0},
+ {q:"Stack follows?",o:["FIFO","LIFO","None","Both"],a:1},
+ {q:"Queue follows?",o:["FIFO","LIFO","None","Both"],a:0},
+ {q:"Which DS is linear?",o:["Array","Tree","Graph","Heap"],a:0}
+];
+
+questions = questions.sort(()=>Math.random()-0.5);
+
+let index=0, score=0;
+
+const opts = document.querySelectorAll(".option-button");
+const next = document.getElementById("nextButton");
+
+function load(){
+ let q=questions[index];
+
+ document.getElementById("questionText").innerText=q.q;
+
+ document.getElementById("option0").innerText=q.o[0];
+ document.getElementById("option1").innerText=q.o[1];
+ document.getElementById("option2").innerText=q.o[2];
+ document.getElementById("option3").innerText=q.o[3];
+
+ document.getElementById("currentQuestion").innerText=index+1;
+ document.getElementById("questionNumber").innerText=index+1;
+ document.getElementById("totalQuestions").innerText=questions.length;
+ document.getElementById("questionTotal").innerText=questions.length;
+
+ document.getElementById("progressBar").style.width =
+  ((index)/questions.length)*100+"%";
+}
+
+opts.forEach((b,i)=>{
+ b.onclick=()=>{
+   opts.forEach(x=>x.classList.remove("selected"));
+   b.classList.add("selected");
+
+   if(i===questions[index].a) score++;
+
+   next.disabled=false;
+ };
+});
+
+next.onclick=()=>{
+ index++;
+
+ if(index<questions.length){
+   load();
+ }else{
+   localStorage.setItem("score",score);
+   localStorage.setItem("total",questions.length);
+
+   let results = JSON.parse(localStorage.getItem("results"))||{};
+   let unit = localStorage.getItem("unit");
+   results[unit]={score,total:questions.length};
+   localStorage.setItem("results",JSON.stringify(results));
+
+   location.href="result.html";
+ }
+};
+
+load();
+}
+
+// ================= RESULT =================
+if(document.getElementById("scoreNumber")){
+
+let s = Number(localStorage.getItem("score"))||0;
+let t = Number(localStorage.getItem("total"))||0;
+
+document.getElementById("scoreNumber").innerText=s;
+document.getElementById("scoreTotal").innerText=t;
+
+let p = Math.round((s/t)*100);
+document.getElementById("percentage").innerText=p+"%";
+
+document.getElementById("retryBtn").onclick=()=>{
+ location.href="difficulty.html";
+};
+
+document.getElementById("dashboardBtn").onclick=()=>{
+ location.href="dashboard.html";
+};
+
+}
+
+// ================= ANALYSIS =================
+if(document.getElementById("analysisPage")){
+
+let data = JSON.parse(localStorage.getItem("results"))||{};
+
+for(let unit in data){
+ console.log(unit, data[unit]);
+}
+
+}
+
+// ================= PROFILE =================
+if(document.getElementById("profilePage")){
+
+let user = localStorage.getItem("user");
+
+document.getElementById("studentName").innerText=user;
+document.getElementById("enrollmentValue").innerText=user;
+
+document.getElementById("logoutBtn").onclick=()=>{
+ localStorage.clear();
+ location.href="index.html";
+};
+
+}
+
+</script>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+import { 
+  getFirestore, collection, getDocs, doc, setDoc, getDoc 
+} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCDx6abGpJdQltTmfzllb9DRQBHvMphFR0",
+  authDomain: "ds-sem2.firebaseapp.com",
+  projectId: "ds-sem2"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+window.db = db;
+
+</script>
+
+<script type="module">
+
+import { collection, getDocs } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+let unit = localStorage.getItem("unit");
+let diff = localStorage.getItem("difficulty");
+
+let questions = [];
+
+const snap = await getDocs(collection(db,"questions",unit,diff));
+
+snap.forEach(doc=>questions.push(doc.data()));
+
+if(questions.length === 0){
+  document.getElementById("questionText").innerText="No questions available";
+  throw new Error("No questions");
+}
+
+// shuffle
+questions.sort(()=>Math.random()-0.5);
+
+let i=0, score=0;
+
+function load(){
+
+ let q=questions[i];
+
+ questionText.innerText=q.q;
+
+ option0.innerText=q.o[0];
+ option1.innerText=q.o[1];
+ option2.innerText=q.o[2];
+ option3.innerText=q.o[3];
+}
+
+document.querySelectorAll(".option-button").forEach((btn,idx)=>{
+
+ btn.onclick=()=>{
+   if(idx===questions[i].a) score++;
+ };
+
+});
+
+nextButton.onclick=()=>{
+
+ i++;
+
+ if(i<questions.length) load();
+ else{
+
+  localStorage.setItem("score",score);
+  localStorage.setItem("total",questions.length);
+
+  location.href="result.html";
+ }
+
+};
+
+load();
+
+</script>
+
+</body>
+</html>

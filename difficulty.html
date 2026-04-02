@@ -1,0 +1,621 @@
+<!-- Difficulty -->
+
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Select Difficulty - DS Quiz</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+    
+    * {
+      font-family: 'Poppins', sans-serif;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: linear-gradient(135deg, #f0f9ff 0%, #fef3c7 50%, #f0e7ff 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100%;
+    }
+
+    .difficulty-container {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .difficulty-header {
+      text-align: center;
+      margin-bottom: 3rem;
+      animation: slideDown 0.6s ease-out;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .difficulty-title {
+      font-size: 2.75rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #3b82f6, #a855f7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 0;
+      margin-bottom: 0.5rem;
+    }
+
+    .difficulty-subtitle {
+      font-size: 1rem;
+      color: #64748b;
+      margin: 0;
+    }
+
+    .difficulty-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 2rem;
+      width: 100%;
+      max-width: 900px;
+    }
+
+    .difficulty-card {
+      background: white;
+      border-radius: 2rem;
+      padding: 2.5rem 2rem;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+      animation: fadeInUp 0.5s ease-out forwards;
+      opacity: 0;
+      border: 2px solid transparent;
+    }
+
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+      }
+    }
+
+    .difficulty-card:nth-child(1) { animation-delay: 0.1s; }
+    .difficulty-card:nth-child(2) { animation-delay: 0.2s; }
+    .difficulty-card:nth-child(3) { animation-delay: 0.3s; }
+
+    .difficulty-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: currentColor;
+    }
+
+    .difficulty-card.easy {
+      color: #22c55e;
+    }
+
+    .difficulty-card.medium {
+      color: #f97316;
+    }
+
+    .difficulty-card.hard {
+      color: #ef4444;
+    }
+
+    .difficulty-card:hover {
+      transform: translateY(-12px);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.15);
+      border-color: currentColor;
+      border-color: rgba(0, 0, 0, 0.1);
+    }
+
+    .difficulty-card.selected {
+      border-color: currentColor;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.15);
+      transform: scale(1.02);
+    }
+
+    .difficulty-icon {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+      font-size: 2rem;
+      background: rgba(0, 0, 0, 0.05);
+    }
+
+    .difficulty-card.easy .difficulty-icon {
+      background: rgba(34, 197, 94, 0.1);
+      color: #22c55e;
+    }
+
+    .difficulty-card.medium .difficulty-icon {
+      background: rgba(249, 115, 22, 0.1);
+      color: #f97316;
+    }
+
+    .difficulty-card.hard .difficulty-icon {
+      background: rgba(239, 68, 68, 0.1);
+      color: #ef4444;
+    }
+
+    .difficulty-label {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+      color: #1e293b;
+    }
+
+    .difficulty-description {
+      font-size: 0.9rem;
+      color: #64748b;
+      margin-bottom: 1.5rem;
+      line-height: 1.5;
+      min-height: 2.7rem;
+    }
+
+    .difficulty-questions {
+      font-size: 0.85rem;
+      color: #94a3b8;
+      font-weight: 500;
+    }
+
+    .difficulty-card:hover .difficulty-icon {
+      transform: scale(1.1);
+    }
+
+    .selection-feedback {
+      margin-top: 2.5rem;
+      text-align: center;
+      min-height: 1.5rem;
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    .feedback-text {
+      color: #3b82f6;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    @media (max-width: 768px) {
+      .difficulty-container {
+        padding: 1.5rem;
+      }
+
+      .difficulty-title {
+        font-size: 2rem;
+      }
+
+      .difficulty-grid {
+        gap: 1.5rem;
+      }
+
+      .difficulty-card {
+        padding: 2rem 1.5rem;
+      }
+
+      .difficulty-icon {
+        width: 60px;
+        height: 60px;
+      }
+
+      .difficulty-label {
+        font-size: 1.25rem;
+      }
+    }
+  </style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  <style>body { box-sizing: border-box; }</style>
+ </head>
+ <body>
+  <div class="difficulty-container">
+   <div class="difficulty-header">
+    <h1 class="difficulty-title" id="difficultyTitle">Select Difficulty</h1>
+    <p class="difficulty-subtitle">Choose your challenge level</p>
+   </div>
+   <div class="difficulty-grid"><!-- Easy Card -->
+    <div class="difficulty-card easy" data-difficulty="easy">
+     <div class="difficulty-icon"><i data-lucide="smile" style="width: 40px; height: 40px;"></i>
+     </div>
+     <div class="difficulty-label" id="easyLabel">
+      Easy
+     </div>
+     <div class="difficulty-description" id="easyDescription">
+      Perfect for beginners
+     </div>
+     <div class="difficulty-questions">
+      5-7 Questions
+     </div>
+    </div><!-- Medium Card -->
+    <div class="difficulty-card medium" data-difficulty="medium">
+     <div class="difficulty-icon"><i data-lucide="zap" style="width: 40px; height: 40px;"></i>
+     </div>
+     <div class="difficulty-label" id="mediumLabel">
+      Medium
+     </div>
+     <div class="difficulty-description" id="mediumDescription">
+      Test your knowledge
+     </div>
+     <div class="difficulty-questions">
+      8-12 Questions
+     </div>
+    </div><!-- Hard Card -->
+    <div class="difficulty-card hard" data-difficulty="hard">
+     <div class="difficulty-icon"><i data-lucide="flame" style="width: 40px; height: 40px;"></i>
+     </div>
+     <div class="difficulty-label" id="hardLabel">
+      Hard
+     </div>
+     <div class="difficulty-description" id="hardDescription">
+      Challenge yourself
+     </div>
+     <div class="difficulty-questions">
+      10-15 Questions
+     </div>
+    </div>
+   </div>
+   <div class="selection-feedback">
+    <p class="feedback-text" id="feedbackText"></p>
+   </div>
+  </div>
+  <script>
+    let config = {
+      difficulty_title: 'Select Difficulty',
+      easy_label: 'Easy',
+      medium_label: 'Medium',
+      hard_label: 'Hard',
+      easy_description: 'Perfect for beginners',
+      medium_description: 'Test your knowledge',
+      hard_description: 'Challenge yourself'
+    };
+
+    const defaultConfig = {
+      difficulty_title: 'Select Difficulty',
+      easy_label: 'Easy',
+      medium_label: 'Medium',
+      hard_label: 'Hard',
+      easy_description: 'Perfect for beginners',
+      medium_description: 'Test your knowledge',
+      hard_description: 'Challenge yourself'
+    };
+
+    let selectedDifficulty = null;
+
+    async function initializeSDK() {
+      await window.elementSdk.init({
+        defaultConfig,
+        onConfigChange: async (updatedConfig) => {
+          config = updatedConfig;
+          document.getElementById('difficultyTitle').textContent = config.difficulty_title || defaultConfig.difficulty_title;
+          document.getElementById('easyLabel').textContent = config.easy_label || defaultConfig.easy_label;
+          document.getElementById('mediumLabel').textContent = config.medium_label || defaultConfig.medium_label;
+          document.getElementById('hardLabel').textContent = config.hard_label || defaultConfig.hard_label;
+          document.getElementById('easyDescription').textContent = config.easy_description || defaultConfig.easy_description;
+          document.getElementById('mediumDescription').textContent = config.medium_description || defaultConfig.medium_description;
+          document.getElementById('hardDescription').textContent = config.hard_description || defaultConfig.hard_description;
+        },
+        mapToCapabilities: () => ({
+          recolorables: [],
+          borderables: [],
+          fontEditable: undefined,
+          fontSizeable: undefined
+        }),
+        mapToEditPanelValues: () => new Map([
+          ['difficulty_title', config.difficulty_title || defaultConfig.difficulty_title],
+          ['easy_label', config.easy_label || defaultConfig.easy_label],
+          ['medium_label', config.medium_label || defaultConfig.medium_label],
+          ['hard_label', config.hard_label || defaultConfig.hard_label],
+          ['easy_description', config.easy_description || defaultConfig.easy_description],
+          ['medium_description', config.medium_description || defaultConfig.medium_description],
+          ['hard_description', config.hard_description || defaultConfig.hard_description]
+        ])
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.elementSdk) {
+        initializeSDK();
+      }
+
+      const difficultyCards = document.querySelectorAll('.difficulty-card');
+      const feedbackText = document.getElementById('feedbackText');
+
+      difficultyCards.forEach(card => {
+        card.addEventListener('click', () => {
+          // Remove previous selection
+          difficultyCards.forEach(c => c.classList.remove('selected'));
+          
+          // Add selection to clicked card
+          card.classList.add('selected');
+          selectedDifficulty = card.getAttribute('data-difficulty');
+          
+          // Update feedback
+          const label = card.querySelector('.difficulty-label').textContent;
+          feedbackText.textContent = `✓ ${label} difficulty selected!`;
+          
+          // Optional: Trigger a callback or animation
+          console.log(`Selected difficulty: ${selectedDifficulty}`);
+        });
+      });
+
+      lucide.createIcons();
+    });
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9e5c8d3c83b747e9',t:'MTc3NTA5ODQ5NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();
+
+ </script>
+
+<script>
+
+// ================= GLOBAL AUTH =================
+const page = location.pathname.split("/").pop();
+
+if(page !== "index.html" && !localStorage.getItem("user")){
+  location.href = "index.html";
+}
+
+// ================= LOGIN =================
+const form = document.getElementById("loginForm");
+
+if(form){
+  form.onsubmit = (e)=>{
+    e.preventDefault();
+
+    let enroll = document.getElementById("enrollment").value.trim();
+
+    if(!enroll){
+      document.getElementById("errorMessage").style.display="block";
+      return;
+    }
+
+    localStorage.setItem("user", enroll);
+    location.href="dashboard.html";
+  };
+}
+
+// ================= DASHBOARD =================
+const unitCards = document.querySelectorAll(".unit-card");
+
+if(unitCards.length){
+  unitCards.forEach(card=>{
+    card.onclick=()=>{
+      let unit = card.querySelector(".unit-title").innerText;
+      localStorage.setItem("unit", unit);
+      location.href="difficulty.html";
+    };
+  });
+}
+
+// ================= PROFILE ICON =================
+const profileIcon = document.querySelector(".profile-icon");
+if(profileIcon){
+  profileIcon.onclick=()=>location.href="profile.html";
+}
+
+// ================= DIFFICULTY =================
+const diffCards = document.querySelectorAll(".difficulty-card");
+
+if(diffCards.length){
+
+  diffCards.forEach(card=>{
+    card.onclick=()=>{
+      let d = card.getAttribute("data-difficulty");
+      localStorage.setItem("difficulty", d);
+      setTimeout(()=>location.href="quiz.html",400);
+    };
+  });
+
+}
+
+// ================= QUIZ =================
+const questionText = document.getElementById("questionText");
+
+if(questionText){
+
+let questions = [
+ {q:"What is Array?",o:["DS","Loop","Func","Var"],a:0},
+ {q:"Stack follows?",o:["FIFO","LIFO","None","Both"],a:1},
+ {q:"Queue follows?",o:["FIFO","LIFO","None","Both"],a:0},
+ {q:"Which DS is linear?",o:["Array","Tree","Graph","Heap"],a:0}
+];
+
+questions = questions.sort(()=>Math.random()-0.5);
+
+let index=0, score=0;
+
+const opts = document.querySelectorAll(".option-button");
+const next = document.getElementById("nextButton");
+
+function load(){
+ let q=questions[index];
+
+ document.getElementById("questionText").innerText=q.q;
+
+ document.getElementById("option0").innerText=q.o[0];
+ document.getElementById("option1").innerText=q.o[1];
+ document.getElementById("option2").innerText=q.o[2];
+ document.getElementById("option3").innerText=q.o[3];
+
+ document.getElementById("currentQuestion").innerText=index+1;
+ document.getElementById("questionNumber").innerText=index+1;
+ document.getElementById("totalQuestions").innerText=questions.length;
+ document.getElementById("questionTotal").innerText=questions.length;
+
+ document.getElementById("progressBar").style.width =
+  ((index)/questions.length)*100+"%";
+}
+
+opts.forEach((b,i)=>{
+ b.onclick=()=>{
+   opts.forEach(x=>x.classList.remove("selected"));
+   b.classList.add("selected");
+
+   if(i===questions[index].a) score++;
+
+   next.disabled=false;
+ };
+});
+
+next.onclick=()=>{
+ index++;
+
+ if(index<questions.length){
+   load();
+ }else{
+   localStorage.setItem("score",score);
+   localStorage.setItem("total",questions.length);
+
+   let results = JSON.parse(localStorage.getItem("results"))||{};
+   let unit = localStorage.getItem("unit");
+   results[unit]={score,total:questions.length};
+   localStorage.setItem("results",JSON.stringify(results));
+
+   location.href="result.html";
+ }
+};
+
+load();
+}
+
+// ================= RESULT =================
+if(document.getElementById("scoreNumber")){
+
+let s = Number(localStorage.getItem("score"))||0;
+let t = Number(localStorage.getItem("total"))||0;
+
+document.getElementById("scoreNumber").innerText=s;
+document.getElementById("scoreTotal").innerText=t;
+
+let p = Math.round((s/t)*100);
+document.getElementById("percentage").innerText=p+"%";
+
+document.getElementById("retryBtn").onclick=()=>{
+ location.href="difficulty.html";
+};
+
+document.getElementById("dashboardBtn").onclick=()=>{
+ location.href="dashboard.html";
+};
+
+}
+
+// ================= ANALYSIS =================
+if(document.getElementById("analysisPage")){
+
+let data = JSON.parse(localStorage.getItem("results"))||{};
+
+for(let unit in data){
+ console.log(unit, data[unit]);
+}
+
+}
+
+// ================= PROFILE =================
+if(document.getElementById("profilePage")){
+
+let user = localStorage.getItem("user");
+
+document.getElementById("studentName").innerText=user;
+document.getElementById("enrollmentValue").innerText=user;
+
+document.getElementById("logoutBtn").onclick=()=>{
+ localStorage.clear();
+ location.href="index.html";
+};
+
+}
+
+</script>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+import { 
+  getFirestore, collection, getDocs, doc, setDoc, getDoc 
+} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCDx6abGpJdQltTmfzllb9DRQBHvMphFR0",
+  authDomain: "ds-sem2.firebaseapp.com",
+  projectId: "ds-sem2"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+window.db = db;
+
+</script>
+
+<script type="module">
+
+import { collection, getDocs } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+let cards = document.querySelectorAll(".difficulty-card");
+let feedback = document.getElementById("feedbackText");
+
+cards.forEach(card=>{
+
+  card.onclick = async ()=>{
+
+    let diff = card.dataset.difficulty;
+    let unit = localStorage.getItem("unit");
+
+    const snap = await getDocs(collection(db,"questions",unit,diff));
+
+    if(snap.empty){
+      feedback.innerText = "❌ Questions are not available";
+      return;
+    }
+
+    localStorage.setItem("difficulty", diff);
+
+    feedback.innerText = "✓ Selected";
+
+    setTimeout(()=>{
+      location.href="quiz.html";
+    },500);
+  };
+
+});
+
+</script>
+
+</body>
+</html>
