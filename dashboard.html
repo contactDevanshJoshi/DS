@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gradient-to-br from-blue-100 to-purple-100 p-6">
+
+<script>
+if(!localStorage.getItem("user")) location.href="index.html";
+</script>
+
+<h1 class="text-2xl font-bold text-center mb-6">Dashboard</h1>
+
+<div class="grid grid-cols-2 gap-4">
+  <button onclick="go('unit1')" class="p-6 bg-white rounded shadow">Unit 1</button>
+  <button onclick="go('unit2')" class="p-6 bg-white rounded shadow">Unit 2</button>
+  <button onclick="go('unit3')" class="p-6 bg-white rounded shadow">Unit 3</button>
+  <button onclick="go('unit4')" class="p-6 bg-white rounded shadow">Unit 4</button>
+
+  <button onclick="location.href='analysis.html'" class="p-6 bg-white rounded shadow">Analysis</button>
+  <button onclick="location.href='profile.html'" class="p-6 bg-white rounded shadow">Profile</button>
+</div>
+
+<button onclick="logout()" class="mt-6 bg-red-400 text-white px-4 py-2 rounded">Logout</button>
+
+<script>
+function go(u){
+  localStorage.setItem("unit", u);
+  localStorage.removeItem("difficulty");
+  location.href="difficulty.html";
+}
+
+function logout(){
+  localStorage.clear();
+  location.href="index.html";
+}
+</script>
+
+</body>
+</html>
