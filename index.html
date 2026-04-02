@@ -1,205 +1,58 @@
 <!-- Index (Login) -->
 
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DS Quiz App</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DS Quiz Login</title>
 
-  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
-  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
 
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
-
-    * { font-family: 'Poppins', sans-serif; }
-
-    body {
-      height: 100vh;
-      background: linear-gradient(135deg, #e0f2fe 0%, #f0e7ff 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .card {
-      background: white;
-      border-radius: 2rem;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.08);
-      padding: 3rem;
-      width: 100%;
-      max-width: 420px;
-    }
-
-    .icon-group {
-      display: flex;
-      justify-content: center;
-      gap: 1rem;
-      margin-bottom: 2rem;
-    }
-
-    .icon-circle {
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .icon-book { background: #e0f2fe; color:#3b82f6; }
-    .icon-brain { background: #f3e8ff; color:#a855f7; }
-    .icon-code { background: #dcfce7; color:#22c55e; }
-
-    h1 {
-      text-align:center;
-      font-size:1.8rem;
-      font-weight:700;
-      margin-bottom:10px;
-      background: linear-gradient(135deg,#3b82f6,#a855f7);
-      -webkit-background-clip:text;
-      -webkit-text-fill-color:transparent;
-    }
-
-    .subtitle {
-      text-align:center;
-      color:#64748b;
-      margin-bottom:2rem;
-    }
-
-    .input-group { margin-bottom:1rem; }
-
-    input {
-      width:100%;
-      padding:10px;
-      border-radius:10px;
-      border:2px solid #e2e8f0;
-    }
-
-    .btn {
-      width:100%;
-      padding:12px;
-      border-radius:12px;
-      background:#3b82f6;
-      color:white;
-      margin-top:1rem;
-    }
-
-    .error-message {
-      color:red;
-      font-size:0.8rem;
-      display:none;
-    }
-
-    .success-state {
-      display:none;
-      text-align:center;
-    }
-  </style>
 </head>
 
-<body>
+<body class="bg-gradient-to-br from-blue-100 to-purple-100 min-h-screen flex items-center justify-center">
 
-<div class="card">
+<div class="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md">
 
-  <div class="icon-group">
-    <div class="icon-circle icon-book"><i data-lucide="book"></i></div>
-    <div class="icon-circle icon-brain"><i data-lucide="brain"></i></div>
-    <div class="icon-circle icon-code"><i data-lucide="code"></i></div>
-  </div>
+  <div class="form-content text-center">
 
-  <div class="form-content">
-    <h1>DS Quiz App</h1>
-    <p class="subtitle">Test your knowledge</p>
+    <h1 class="text-2xl font-bold mb-2">DS Quiz App</h1>
+    <p class="text-gray-500 mb-6">Login to continue</p>
 
     <form id="loginForm">
 
-      <div class="input-group">
-        <label>Enrollment Number</label>
-        <input type="text" id="enrollment" placeholder="Enter enrollment" required>
-      </div>
+      <input id="enrollment" type="text" placeholder="Enrollment No"
+        class="w-full p-3 border rounded mb-3">
 
-      <div class="input-group">
-        <label>Password</label>
-        <input type="password" id="password" placeholder="Enter password" required>
-      </div>
+      <input id="password" type="password" placeholder="Password"
+        class="w-full p-3 border rounded mb-3">
 
-      <div class="error-message" id="errorMessage"></div>
+      <p id="errorMessage" class="text-red-500 text-sm mb-2 hidden"></p>
 
-      <button class="btn">Start Quiz</button>
+      <button class="w-full bg-blue-500 text-white p-3 rounded">
+        Login
+      </button>
 
     </form>
+
   </div>
 
-  <div class="success-state" id="successState">
-    <h2>Welcome!</h2>
-    <p>Enrollment: <span id="enrollmentDisplay"></span></p>
+  <!-- Success UI (same concept) -->
+  <div id="successState" class="hidden text-center">
+    <h2 class="text-xl font-bold text-green-600">Login Successful</h2>
+    <p id="enrollmentDisplay"></p>
   </div>
 
 </div>
 
-<script>
-
-document.addEventListener('DOMContentLoaded', () => {
-
-  const form = document.getElementById('loginForm');
-  const enrollment = document.getElementById('enrollment');
-  const password = document.getElementById('password');
-  const error = document.getElementById('errorMessage');
-
-  const formContent = document.querySelector('.form-content');
-  const successState = document.getElementById('successState');
-  const enrollmentDisplay = document.getElementById('enrollmentDisplay');
-
-  // already logged in
-  if(localStorage.getItem("user")){
-    location.href="dashboard.html";
-  }
-
-  form.onsubmit = (e)=>{
-    e.preventDefault();
-
-    let eVal = enrollment.value.trim();
-    let pVal = password.value.trim();
-
-    if(!eVal || !pVal){
-      error.innerText="Enter all fields";
-      error.style.display="block";
-      return;
-    }
-
-    if(pVal.length < 4){
-      error.innerText="Password too short";
-      error.style.display="block";
-      return;
-    }
-
-    error.style.display="none";
-
-    localStorage.setItem("user", eVal);
-
-    formContent.style.display="none";
-    successState.style.display="block";
-    enrollmentDisplay.innerText=eVal;
-
-    setTimeout(()=>{
-      location.href="dashboard.html";
-    },1000);
-  };
-
-});
-
-lucide.createIcons();
-
-</script>
-
+<!-- 🔥 FIREBASE SCRIPT -->
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
-import { 
-  getFirestore, collection, getDocs, doc, setDoc, getDoc 
-} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } 
+from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCDx6abGpJdQltTmfzllb9DRQBHvMphFR0",
@@ -208,9 +61,61 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+const auth = getAuth(app);
 
-window.db = db;
+// 🔐 AUTO LOGIN (SESSION)
+onAuthStateChanged(auth, (user)=>{
+  if(user){
+    window.location.href = "dashboard.html";
+  }
+});
+
+// ================= LOGIN =================
+const form = document.getElementById("loginForm");
+const enrollment = document.getElementById("enrollment");
+const password = document.getElementById("password");
+const error = document.getElementById("errorMessage");
+
+const formContent = document.querySelector(".form-content");
+const successState = document.getElementById("successState");
+const enrollmentDisplay = document.getElementById("enrollmentDisplay");
+
+form.addEventListener("submit", async (e)=>{
+  e.preventDefault();
+
+  let eVal = enrollment.value.trim();
+  let pVal = password.value.trim();
+
+  if(!eVal || !pVal){
+    error.innerText = "Enter all fields";
+    error.classList.remove("hidden");
+    return;
+  }
+
+  let email = eVal + "@ds.com";
+
+  try{
+
+    await signInWithEmailAndPassword(auth, email, pVal);
+
+    localStorage.setItem("user", eVal);
+
+    formContent.style.display = "none";
+    successState.classList.remove("hidden");
+    enrollmentDisplay.innerText = eVal;
+
+    setTimeout(()=>{
+      window.location.href = "dashboard.html";
+    },1000);
+
+  }catch(err){
+    error.innerText = "Invalid Enrollment or Password";
+    error.classList.remove("hidden");
+  }
+
+});
+
+lucide.createIcons();
 
 </script>
 
